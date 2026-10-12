@@ -4,12 +4,12 @@ Este documento descreve os principais conceitos e entidades do domínio da esté
 
 ## 1. Cliente
 Representa a pessoa física ou jurídica proprietária dos veículos atendidos na estética.
-- **Atributos Conceituais:** Nome, Telefone/WhatsApp, CPF/CNPJ, E-mail, Endereço.
+- **Atributos Conceituais:** Nome (obrigatório), Telefone/WhatsApp (obrigatório), CPF/CNPJ, E-mail, Endereço.
 - **Relacionamentos:** Um cliente pode possuir um ou mais *Veículos*. Um cliente pode ter várias *Ordens de Serviço*.
 
 ## 2. Veículo
 Representa o automóvel cadastrado no sistema para realização dos serviços.
-- **Atributos Conceituais:** Placa, Marca, Modelo, Ano, Cor, Categoria (Hatch, Sedã, SUV, Picape, Esportivo).
+- **Atributos Conceituais:** Placa (obrigatória), Marca, Modelo (obrigatório), Ano, Cor, Categoria (Hatch, Sedã, SUV, Picape, Esportivo).
 - **Relacionamentos:** Pertence a um único *Cliente*. Pode estar associado a várias *Ordens de Serviço*.
 
 ## 3. Serviço

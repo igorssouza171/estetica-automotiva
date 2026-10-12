@@ -37,7 +37,7 @@ Muitas estéticas automotivas gerenciam agendamentos e ordens de serviço (OS) d
 
 ## 8. Arquitetura Tecnológica
 - **Backend:** Xano (Backend-as-a-Service) com XanoScript / REST APIs.
-- **Frontend:** Reflex (Python) ou Streamlit.
+- **Frontend:** Streamlit (Python).
 - **Banco de Dados:** Estrutura relacional mantida no Xano.
 - **Controle de Versão:** Git + GitHub.
 

@@ -1,0 +1,25 @@
+schema: spec-driven
+context: |
+  Project: Sistema de Administração para Estética Automotiva
+  Domain: Plataforma para gerenciamento de clientes, veículos, catálogo de serviços, ordens de serviço (OS) e estoque de insumos automotivos.
+  Tech stack: Python, Reflex ou Streamlit no Frontend, Xano no Backend e REST API.
+  Architecture: As regras de negócio e persistência devem ficar centralizadas no backend. O frontend atua no consumo das APIs e interface com o usuário.
+  Development: O desenvolvimento será conduzido incrementalmente via OpenSpec.
+  Language: Escrever todos os artefatos OpenSpec, documentações e código em português brasileiro (pt-BR).
+
+rules:
+  proposal:
+    - Descrever claramente o problema, objetivo e escopo da funcionalidade.
+    - Explicitar o que está fora do escopo.
+  specs:
+    - Criar requisitos verificáveis e cenários de teste claros.
+  tasks:
+    - Dividir as tarefas de implementação em etapas pequenas e verificáveis.
+
+operations:
+  apply:
+    guidance:
+      - Executar testes e verificações antes de finalizar cada tarefa.
+  archive:
+    guidance:
+      - Confirmar que a implementação atende a todos os requisitos da especificação.

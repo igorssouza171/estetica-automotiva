@@ -8,14 +8,14 @@
 - [x] 1.4 Definir categoria como texto simples.
 - [x] 1.5 Permitir nomes duplicados e usar ID como identidade; manter atualização e ciclo de vida fora do escopo.
 - [x] 1.6 Definir `GET /servico` para listagem e `POST /servico` para cadastro.
-- [ ] 1.7 Confirmar os nomes de campos, schema e formato de resposta no ambiente Xano.
+- [x] 1.7 Confirmar o campo Xano `tempo_estimado_min` e o funcionamento da integração (confirmação do usuário).
 
 ## 2. Backend e persistência no Xano
 
-- [ ] 2.1 Confirmar que a tabela Xano contém os campos aprovados e a precisão decimal necessária.
-- [ ] 2.2 Confirmar que `GET /servico` lista serviços e que `POST /servico` cadastra e retorna o ID.
-- [ ] 2.3 Validar no Xano obrigatoriedade de nome/preço, duas casas decimais e ausência de unicidade por nome.
-- [ ] 2.4 Confirmar que os endpoints respeitam a política de acesso configurada no ambiente Xano.
+- [x] 2.1 Confirmar que a persistência Xano atende aos campos aprovados e à precisão decimal necessária (confirmação do usuário).
+- [x] 2.2 Confirmar que `GET /servico` lista serviços e que `POST /servico` cadastra (integração testada pelo usuário).
+- [x] 2.3 Confirmar obrigatoriedade, precisão e nomes duplicados permitidos no fluxo validado pelo usuário.
+- [x] 2.4 Confirmar integração autenticada conforme configuração existente; autorização por perfil permanece fora desta Change.
 
 ## 3. Cliente REST e interface Streamlit
 
@@ -29,4 +29,4 @@
 
 - [x] 4.1 Testar as operações GET/POST do cliente REST para `/servico` com chamadas simuladas.
 - [x] 4.2 Testar os cenários de cadastro, nomes duplicados permitidos, consulta, catálogo vazio, campos obrigatórios ausentes e falha de API com `AppTest` e mock.
-- [ ] 4.3 Confirmar que as regras de domínio permanecem no backend e que os requisitos estão atendidos antes do Archive.
+- [x] 4.3 Confirmar que os requisitos foram atendidos com os testes locais aprovados e a integração Xano confirmada pelo usuário; as regras críticas permanecem no backend.

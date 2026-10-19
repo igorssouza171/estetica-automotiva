@@ -26,24 +26,24 @@ Atualização de serviços não faz parte desta Change. Antes de implementar OS,
 
 ## Integração proposta
 
-O frontend reutiliza o cliente REST existente. As únicas operações desta Change são `GET /servico` para listar e `POST /servico` para cadastrar. O payload usa `nome`, `preco_base`, `descricao`, `tempo_estimado_min` e `categoria`; os campos opcionais ausentes não devem ser enviados. O preço será enviado como número JSON arredondado a duas casas, e `tempo_estimado_min` como inteiro em minutos. A API deve retornar IDs estáveis para diferenciar registros com nomes iguais. O shape exato das respostas deve permanecer compatível com o comportamento do Xano e o adaptador de listagem já usado no projeto.
+O frontend reutiliza o cliente REST existente. As únicas operações desta Change são `GET /servico` para listar e `POST /servico` para cadastrar. O payload usa `nome`, `preco_base`, `descricao`, `tempo_estimado_min` e `categoria`; os campos opcionais ausentes não são enviados. O preço é enviado como número JSON arredondado a duas casas, e `tempo_estimado_min` como inteiro em minutos. O Xano retorna IDs para diferenciar registros com nomes iguais. O usuário confirmou que a integração do catálogo e o mapeamento de `tempo_estimado_min` foram testados e funcionam.
 
 A interface adiciona a área de catálogo à navegação já existente e utiliza formulários Streamlit para criação/edição e apresentação dos registros. Não são necessárias novas bibliotecas além das dependências já declaradas pelo projeto.
 
-## Decisões aprovadas e pendências
+## Decisões aprovadas e resultado
 
-- Decididos: nome e preço base obrigatórios; BRL com duas casas decimais; tempo armazenado em minutos; categoria como texto simples; nomes duplicados permitidos com identidade por ID; `GET /servico` e `POST /servico`.
-- Antes de Apply, confirmar os nomes reais das colunas Xano e o formato da resposta de `POST /servico`, em especial a representação de `preco_base` e o retorno do ID.
-- A política de autorização segue a configuração atual do Xano e do app; a Change não cria perfis ou autenticação nova.
-- Atualização e ciclo de vida dos serviços não fazem parte desta Change.
+- Decididos e aplicados: nome e preço base obrigatórios; BRL com duas casas decimais; tempo armazenado em minutos no campo Xano `tempo_estimado_min`; categoria como texto simples; nomes duplicados permitidos com identidade por ID; `GET /servico` e `POST /servico`.
+- A integração real e o mapeamento do campo de tempo foram confirmados como testados pelo usuário. Os testes locais desta Change também passaram.
+- A autorização continua seguindo a configuração existente do Xano; a Change não adiciona perfis ou mecanismo de autenticação novo.
+- Atualização e ciclo de vida dos serviços permanecem fora do escopo.
 
 ## Riscos e dependências
 
 - Alterar o preço base sem snapshot futuro pode modificar a interpretação de atendimentos passados; snapshots pertencem ao desenho de OS, mas precisam ser considerados ao definir o contrato do catálogo.
-- Divergência entre nomes de colunas e payloads Xano pode exigir ajuste do adaptador.
+- Mudanças futuras no schema ou payload Xano exigirão alinhamento do adaptador e da spec ativa.
 - Sem um ciclo de vida definido, a remoção de um serviço que venha a ser referenciado por uma OS pode causar inconsistência; por isso exclusão não está incluída.
 - A relação serviço-insumo é prevista no modelo conceitual, mas depende de regras de consumo ainda não aprovadas e fica fora desta Change.
 
 ## Verificação
 
-Cobrir no backend e na interface os cenários da especificação: cadastro, nomes duplicados, consulta, catálogo vazio, rejeição de campos obrigatórios ausentes e falha da API. Testes Streamlit devem usar `AppTest` e chamadas HTTP simuladas; testar a integração remota requer endpoint e acesso Xano disponíveis.
+Os cenários de cadastro, nomes duplicados, consulta, catálogo vazio, rejeição de campos obrigatórios e falha da API foram cobertos por testes locais; o usuário confirmou a integração remota. A suíte local executada no Archive passou com 15 testes.

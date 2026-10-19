@@ -72,6 +72,38 @@ class XanoClientTests(unittest.TestCase):
         self.assertEqual(request.full_url, "https://example.xano.io/api:group/veiculo")
         self.assertEqual(json.loads(request.data.decode("utf-8")), payload)
 
+    @patch("xano_client.urlopen")
+    def test_list_servicos_uses_singular_route(self, urlopen):
+        urlopen.return_value = FakeResponse(
+            {"items": [{"id": 15, "nome": "Lavagem", "tempo_estimado_min": "60"}]}
+        )
+
+        records = self.client.list_servicos()
+
+        self.assertEqual(
+            records,
+            [{"id": 15, "nome": "Lavagem", "tempo_estimado_min": 60}],
+        )
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.method, "GET")
+        self.assertEqual(request.full_url, "https://example.xano.io/api:group/servico")
+
+    @patch("xano_client.urlopen")
+    def test_create_servico_posts_payload_to_singular_route(self, urlopen):
+        urlopen.return_value = FakeResponse({"id": 15})
+        payload = {"nome": "Lavagem", "preco_base": 89.9, "tempo_estimado_min": "60"}
+
+        result = self.client.create_servico(payload)
+
+        self.assertEqual(result, {"id": 15})
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.method, "POST")
+        self.assertEqual(request.full_url, "https://example.xano.io/api:group/servico")
+        self.assertEqual(
+            json.loads(request.data.decode("utf-8")),
+            {"nome": "Lavagem", "preco_base": 89.9, "tempo_estimado_min": 60},
+        )
+
     def test_requires_base_url_and_token(self):
         with self.assertRaises(ValueError):
             XanoClient("", "test-token")

@@ -1,8 +1,9 @@
-"""Interface Streamlit para cadastro e consulta de clientes e veículos."""
+"""Interface Streamlit para cadastro e consulta de clientes, veículos e serviços."""
 
 from __future__ import annotations
 
 import os
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 import streamlit as st
@@ -10,8 +11,8 @@ import streamlit as st
 from xano_client import XanoAPIError, XanoClient
 
 
-st.set_page_config(page_title="Clientes e veículos", page_icon="🚘", layout="wide")
-st.title("Clientes e veículos")
+st.set_page_config(page_title="Clientes, veículos e serviços", page_icon="🚘", layout="wide")
+st.title("Clientes, veículos e serviços")
 st.caption("Cadastro e consulta integrados à API do Xano")
 
 base_url = os.getenv("XANO_API_BASE_URL", "").strip()
@@ -24,7 +25,7 @@ if not base_url or not token:
     st.stop()
 
 client = XanoClient(base_url, token)
-section = st.sidebar.radio("Cadastro", ("Clientes", "Veículos"))
+section = st.sidebar.radio("Cadastro", ("Clientes", "Veículos", "Serviços"))
 
 
 def optional_text(label: str, key: str) -> str | None:
@@ -45,6 +46,17 @@ def show_records(records: list[dict[str, Any]], columns: dict[str, str]) -> None
         hide_index=True,
         width="stretch",
     )
+
+
+def format_brl(value: Any) -> str:
+    if value is None:
+        return ""
+    try:
+        amount = Decimal(str(value)).quantize(Decimal("0.01"))
+    except (InvalidOperation, ValueError):
+        return str(value)
+    formatted = f"{amount:,.2f}".translate(str.maketrans({",": ".", ".": ","}))
+    return f"R$ {formatted}"
 
 
 if section == "Clientes":
@@ -94,6 +106,99 @@ if section == "Clientes":
                     "cpf_cnpj": "CPF/CNPJ",
                     "email": "E-mail",
                     "endereco": "Endereço",
+                },
+            )
+        except XanoAPIError as error:
+            show_error(error)
+
+elif section == "Serviços":
+    form_column, list_column = st.columns((1, 1.5), gap="large")
+    with form_column:
+        st.subheader("Novo serviço")
+        if st.session_state.pop("servico_criado", False):
+            st.success("Serviço cadastrado.")
+        with st.form("novo_servico", clear_on_submit=True):
+            nome = st.text_input("Nome *", key="servico_nome")
+            preco_base = st.number_input(
+                "Preço base (R$) *",
+                value=None,
+                step=0.01,
+                format="%.2f",
+                required=True,
+                key="servico_preco_base",
+            )
+            descricao = st.text_area("Descrição", key="servico_descricao")
+            tempo_estimado_min = st.number_input(
+                "Tempo estimado (minutos)",
+                value=None,
+                step=1,
+                format="%d",
+                key="servico_tempo_estimado_min",
+            )
+            categoria = st.text_input("Categoria", key="servico_categoria")
+            submitted = st.form_submit_button(
+                "Cadastrar serviço",
+                type="primary",
+                key="create_servico",
+            )
+
+        if submitted:
+            if not nome.strip():
+                st.warning("Nome é obrigatório.")
+            elif preco_base is None:
+                st.warning("Preço base é obrigatório.")
+            else:
+                try:
+                    preco_decimal = Decimal(str(preco_base))
+                    preco_centavos = preco_decimal.quantize(Decimal("0.01"))
+                except (InvalidOperation, ValueError):
+                    st.warning("Informe um preço base válido em reais.")
+                else:
+                    if preco_decimal != preco_centavos:
+                        st.warning("Informe o preço base com no máximo duas casas decimais.")
+                    else:
+                        payload: dict[str, Any] = {
+                            "nome": nome.strip(),
+                            "preco_base": float(preco_centavos),
+                        }
+                        if descricao.strip():
+                            payload["descricao"] = descricao.strip()
+                        if tempo_estimado_min is not None:
+                            payload["tempo_estimado_min"] = int(tempo_estimado_min)
+                        if categoria.strip():
+                            payload["categoria"] = categoria.strip()
+
+                        try:
+                            client.create_servico(payload)
+                            st.session_state["servico_criado"] = True
+                            st.rerun()
+                        except XanoAPIError as error:
+                            show_error(error)
+
+    with list_column:
+        st.subheader("Serviços cadastrados")
+        try:
+            servicos = client.list_servicos()
+            registros = [
+                {
+                    "id": servico.get("id"),
+                    "nome": servico.get("nome"),
+                    "descricao": servico.get("descricao"),
+                    "preco_base": format_brl(servico.get("preco_base")),
+                    "tempo_estimado_min": servico.get("tempo_estimado_min"),
+                    "categoria": servico.get("categoria"),
+                }
+                for servico in servicos
+            ]
+            show_records(
+                registros,
+                {
+                    "id": "ID",
+                    "nome": "Nome",
+                    "descricao": "Descrição",
+                    "preco_base": "Preço base",
+                    "tempo_estimado_min": "Tempo (minutos)",
+                    "categoria": "Categoria",
                 },
             )
         except XanoAPIError as error:

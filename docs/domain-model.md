@@ -14,7 +14,8 @@ Representa o automóvel cadastrado no sistema para realização dos serviços.
 
 ## 3. Serviço
 Representa os tipos de procedimentos oferecidos pelo estabelecimento.
-- **Atributos Conceituais:** Nome do serviço, Descrição, Preço Base, Tempo Estimado (em minutos/horas), Categoria.
+- **Atributos Conceituais:** Nome do serviço (obrigatório), Descrição, Preço Base (obrigatório, em Real/BRL com duas casas decimais), Tempo Estimado (opcional, em minutos), Categoria (opcional, texto simples).
+- **Identificação:** Cada serviço é identificado pelo seu ID; nomes duplicados são permitidos.
 - **Relacionamentos:** Um serviço pode estar presente em várias *Ordens de Serviço*. Pode consumir um ou mais *Produtos/Insumos*.
 
 ## 4. Ordem de Serviço (OS) / Agendamento

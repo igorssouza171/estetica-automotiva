@@ -1,4 +1,4 @@
-"""Cliente REST mínimo para as operações de clientes e veículos no Xano."""
+"""Cliente REST mínimo para operações de clientes, veículos e serviços no Xano."""
 
 from __future__ import annotations
 
@@ -100,3 +100,21 @@ class XanoClient:
 
     def create_veiculo(self, payload: dict[str, Any]) -> Any:
         return self._request("POST", "veiculo", payload)
+
+    def list_servicos(self) -> list[dict[str, Any]]:
+        servicos = self._records(self._request("GET", "servico"))
+        return [
+            {
+                **servico,
+                "tempo_estimado_min": int(servico["tempo_estimado_min"]),
+            }
+            if servico.get("tempo_estimado_min") is not None
+            else servico
+            for servico in servicos
+        ]
+
+    def create_servico(self, payload: dict[str, Any]) -> Any:
+        dados = dict(payload)
+        if dados.get("tempo_estimado_min") is not None:
+            dados["tempo_estimado_min"] = int(dados["tempo_estimado_min"])
+        return self._request("POST", "servico", dados)

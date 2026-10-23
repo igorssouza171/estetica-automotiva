@@ -19,11 +19,12 @@ Representa os tipos de procedimentos oferecidos pelo estabelecimento.
 - **Relacionamentos:** Um serviço pode estar presente em várias *Ordens de Serviço*. Pode consumir um ou mais *Produtos/Insumos*.
 
 ## 4. Ordem de Serviço (OS) / Agendamento
-Representa o registro do atendimento de um veículo específico em uma data e horário determinados.
-- **Atributos Conceituais:** Data/Hora Agendada, Data/Hora de Entrada, Data/Hora de Conclusão, Status (`Aguardando`, `Em Execução`, `Aguardando Retirada`, `Entregue`, `Cancelado`), Valor Total, Observações sobre o Estado do Veículo.
+Representa o atendimento de um veículo em uma estrutura compartilhada com o agendamento e evolui por status.
+- **Atributos Conceituais:** Data/Hora de Abertura (gerada automaticamente), Previsão de Entrega (calculada pela soma dos tempos dos serviços ou informada manualmente), Data/Hora de Entrada, Data/Hora de Conclusão, Status (`Aguardando`, `Em Andamento`, `Concluído`, `Entregue`, `Cancelado`), Valor Total (soma dos itens), Observações sobre o Estado do Veículo.
+- **Transições:** Avanço sequencial de `Aguardando` para `Em Andamento`, depois `Concluído` e `Entregue`; pode ser cancelada a partir de qualquer status não cancelado. `Cancelado` é terminal.
 - **Relacionamentos:**
   - Pertence a um *Cliente* e a um *Veículo*.
-  - Contém um ou mais *Serviços*.
+  - Contém um ou mais itens de serviço identificados por *Serviço* e com preço unitário congelado no momento da abertura.
   - Registrada/atualizada por um *Usuário* do sistema.
 
 ## 5. Produto / Insumo (Estoque)

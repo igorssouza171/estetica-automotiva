@@ -26,7 +26,7 @@ Muitas estéticas automotivas gerenciam agendamentos e ordens de serviço (OS) d
 ## 6. Principais Funcionalidades
 - **Gestão de Clientes e Veículos:** Associação de múltiplos veículos a um mesmo cliente (modelo, marca, placa, cor).
 - **Gestão de Serviços:** Cadastro de procedimentos (Lavagem Detalhada, Polimento Técnico, Higienização Interna, Vitrificação).
-- **Abertura e Status de OS:** Criação de OS associada ao veículo com alteração de status (`Aguardando`, `Em Execução`, `Pronto`, `Entregue`).
+- **Abertura e Status de OS:** Criação de OS associada ao cliente, veículo e serviços, com avanço sequencial de status (`Aguardando`, `Em Andamento`, `Concluído`, `Entregue`) ou cancelamento.
 - **Agendamento:** Agenda visual de horários dos serviços.
 - **Controle de Insumos:** Baixa de estoque associada ao uso nos serviços.
 

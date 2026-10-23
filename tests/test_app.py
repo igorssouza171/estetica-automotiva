@@ -87,7 +87,7 @@ def fake_urlopen(request, timeout):
                         {"servico_id": 15, "preco_unitario": 89.9, "tempo_estimado_min": 60}
                     ],
                     "status": "Aguardando",
-                    "data_abertura": "2026-10-19T12:00:00",
+                    "created_at": "2026-10-19T12:00:00",
                     "previsao_entrega": "2026-10-19T13:00:00",
                     "valor_total": 89.9,
                 }
@@ -324,7 +324,8 @@ class StreamlitAppTests(unittest.TestCase):
         self.assertEqual(row["Cliente"], "Cliente Teste")
         self.assertEqual(row["Veículo"], "ABC1D23 Modelo Teste")
         self.assertEqual(row["Serviços"], "Lavagem detalhada")
-        self.assertEqual(row["Status"], "Aguardando")
+        self.assertEqual(row["Status"], "🟡 Aguardando")
+        self.assertEqual(row["Abertura"], "19/10/2026 12:00")
 
     def test_service_order_loads_vehicles_only_after_customer_selection(self):
         with patch.dict(

@@ -13,8 +13,12 @@ import streamlit as st
 from xano_client import XanoAPIError, XanoClient
 
 
-st.set_page_config(page_title="Clientes, veículos e serviços", page_icon="🚘", layout="wide")
-st.title("Clientes, veículos e serviços")
+st.set_page_config(
+    page_title="Gestão de Estética Automotiva",
+    page_icon="🚗",
+    layout="wide",
+)
+st.title("Gestão de Estética Automotiva")
 st.caption("Cadastro e consulta integrados à API do Xano")
 
 base_url = os.getenv("XANO_API_BASE_URL", "").strip()
@@ -27,7 +31,10 @@ if not base_url or not token:
     st.stop()
 
 client = XanoClient(base_url, token)
-section = st.sidebar.radio("Cadastro", ("Clientes", "Veículos", "Serviços", "Ordens de Serviço"))
+section = st.sidebar.radio(
+    "Navegação",
+    ("Clientes", "Veículos", "Serviços", "Ordens de Serviço"),
+)
 
 STATUS_OS_SEQUENCIA = ("Aguardando", "Em Andamento", "Concluído", "Entregue")
 STATUS_OS_CANCELADO = "Cancelado"
@@ -112,6 +119,41 @@ def transicoes_os_permitidas(status_atual: str) -> list[str]:
     proximos = list(STATUS_OS_SEQUENCIA[indice + 1 : indice + 2])
     proximos.append(STATUS_OS_CANCELADO)
     return proximos
+
+
+def format_status(status: Any) -> str:
+    badges = {
+        "Aguardando": "🟡 Aguardando",
+        "Em Andamento": "🔵 Em Andamento",
+        "Concluído": "🟢 Concluído",
+        "Cancelado": "🔴 Cancelado",
+        "Entregue": "✅ Entregue",
+    }
+    return badges.get(str(status), str(status or "Sem status"))
+
+
+try:
+    ordens_para_kpi = session_cached_xano_data("ordens_servico", client.list_ordens_servico)
+    ordens_kpi_carregadas = True
+except XanoAPIError:
+    ordens_para_kpi = []
+    ordens_kpi_carregadas = False
+
+ordens_abertas = sum(
+    1
+    for ordem in ordens_para_kpi
+    if ordem.get("status") not in {"Concluído", "Entregue", "Cancelado"}
+)
+ordens_concluidas = sum(1 for ordem in ordens_para_kpi if ordem.get("status") == "Concluído")
+faturamento_total = sum(
+    (Decimal(str(ordem.get("valor_total", 0) or 0)) for ordem in ordens_para_kpi),
+    Decimal("0.00"),
+).quantize(Decimal("0.01"))
+
+metric_columns = st.columns(3)
+metric_columns[0].metric("Total de O.S. abertas", ordens_abertas)
+metric_columns[1].metric("Total de O.S. concluídas", ordens_concluidas)
+metric_columns[2].metric("Faturamento total", format_brl(faturamento_total))
 
 
 if section == "Clientes":
@@ -271,12 +313,11 @@ elif section == "Ordens de Serviço":
     if status_atualizado:
         st.success(f"Status da O.S. {status_atualizado[0]} atualizado para {status_atualizado[1]}.")
 
-    os_data_loaded = True
+    os_data_loaded = ordens_kpi_carregadas
     try:
         clientes_os = session_cached_xano_data("clientes", client.list_clientes)
         servicos_os = session_cached_xano_data("servicos", client.list_servicos)
-        with st.spinner(SPINNER_XANO):
-            ordens_servico = client.list_ordens_servico()
+        ordens_servico = ordens_para_kpi
     except XanoAPIError as error:
         os_data_loaded = False
         clientes_os = []
@@ -433,7 +474,7 @@ elif section == "Ordens de Serviço":
                         if value
                     ),
                     "servicos": ", ".join(nomes_servicos_ordem),
-                    "status": ordem.get("status", ""),
+                    "status": format_status(ordem.get("status", "")),
                     "data_abertura": format_datetime(ordem.get("created_at")),
                     "valor_total": format_brl(ordem.get("valor_total")),
                 }
